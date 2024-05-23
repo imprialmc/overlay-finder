@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  <title>Fetch Packs</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+      background-color: #f8f9fa; /* Added background color */
+    }
+
+    #title {
+      text-align: center;
+      margin-bottom: 20px;
+      color: #007bff; /* Changed title color */
+    }
+
+    .search-container {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    #searchInput {
+      padding: 8px;
+      font-size: 16px;
+      border: 1px solid #ced4da; /* Added border */
+      border-radius: 5px; /* Added border-radius */
+    }
+
+    #searchBtn {
+      padding: 8px 20px;
+      font-size: 16px;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      cursor: pointer;
+      border-radius: 5px; /* Added border-radius */
+    }
+
+    #searchBtn:hover {
+      background-color: #0056b3; /* Darker color on hover */
+    }
+
+    #output {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .searchResult {
+      width: calc(33.33% - 20px); /* 33.33% width for each result box with 20px spacing */
+      border: 1px solid #ced4da; /* Added border */
+      border-radius: 5px; /* Added border-radius */
+      padding: 10px; /* Increased padding */
+      margin: 10px;
+      box-sizing: border-box;
+      text-align: center;
+      background-color: white; /* Added background color */
+      transition: all 0.3s ease; /* Added smooth transition */
+    }
+
+    .searchResult:hover {
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Added box-shadow on hover */
+    }
+
+    .searchResult img {
+      width: 100%;
+      height: auto;
+      display: block;
+      border-radius: 5px; /* Added border-radius */
+    }
+    .searchResult h1 {
+      margin-top: 10px; /* Added margin top */
+      margin-bottom: 5px; /* Added margin bottom */
+      font-size: 18px; /* Increased font size */
+      color: #007bff; /* Changed title color */
+    }
+    .searchResult h3 {
+      margin-bottom: 10px; /* Added margin bottom */
+      font-size: 16px; /* Increased font size */
+      color: #6c757d; /* Changed subtitle color */
+    }
+    .searchResult a {
+      display: inline-block; /* Changed display to inline-block */
+      text-decoration: none;
+      color: white;
+      padding: 5px 10px; /* Increased padding */
+      border-radius: 5px; /* Added border-radius */
+      background-color: #007bff;
+      margin-top: 10px; /* Added margin top */
+      transition: background-color 0.3s ease; /* Added smooth transition */
+    }
+    .searchResult a:hover {
+      background-color: #0056b3; /* Darker color on hover */
+    }
+  </style>
+</head>
+<body>
+  <h1 id="title">Fetch Packs</h1>
+  <div class="search-container">
+    <label for="searchInput">Search:</label>
+    <input type="text" id="searchInput">
+    <button id="searchBtn">Search</button>
+  </div>
+  <div id="output"></div>
+
+  <script src="packsAPI.js"></script>
+  <script>
+    let currentImageIndex = 1; // Keeps track of the current image index
+
+    // Function to display fetched data
+    function displayData(data) {
+      let outputDiv = document.getElementById("output");
+      outputDiv.innerHTML = "";
+      if (data.length === 0) {
+        outputDiv.textContent = "No data available.";
+        return;
+      }
+      data.forEach((pack) => {
+        let packDiv = document.createElement("div");
+        packDiv.classList.add("searchResult");
+
+        // Create elements for pack name, creator, and download link
+        let nameElement = document.createElement("h1");
+        nameElement.textContent = pack.pack_name;
+
+        let creatorElement = document.createElement("h3");
+        creatorElement.textContent = "By " + pack.pack_creator;
+
+        let downloadLinkElement = document.createElement("a");
+        downloadLinkElement.textContent = "Download "; // Removed the icon HTML from the textContent
+        let iconElement = document.createElement("i"); // Created an <i> element for the icon
+        iconElement.classList.add("fa", "fa-download"); // Added classes for the Font Awesome icon
+        iconElement.style.fontSize = "20px"; // Applied inline style for font size
+        downloadLinkElement.appendChild(iconElement); // Appended the icon to the download link
+        downloadLinkElement.href = pack.download_link;
+        downloadLinkElement.setAttribute("target", "_blank");
+        downloadLinkElement.classList.add("downloadLink");
+
+        packDiv.appendChild(nameElement);
+        packDiv.appendChild(creatorElement);
+        packDiv.appendChild(downloadLinkElement);
+
+        // Create image element if images exist
+        if (pack.images > 0) {
+          let imageElement = document.createElement("img");
+          imageElement.src = "packs/" + pack.id + "/image1.jpg"; // Default to image1
+          imageElement.alt = pack.pack_name; // Add alt text for accessibility
+          packDiv.appendChild(imageElement);
+
+          // Add hover effect only if there are multiple images
+          if (pack.images > 1) {
+            // Change image on hover
+            imageElement.addEventListener("mouseover", function () {
+              currentImageIndex = currentImageIndex % pack.images + 1;
+              this.src = "packs/" + pack.id + "/image" + currentImageIndex + ".jpg";
+            });
+
+            // Restore original image on mouseout
+            imageElement.addEventListener("mouseout", function () {
+              this.src = "packs/" + pack.id + "/image1.jpg"; // Reset to image1
+            });
+          }
+        }
+
+        outputDiv.appendChild(packDiv);
+      });
+    }
+
+    // Function to handle search
+    async function handleSearch() {
+      let searchInput = document
+        .getElementById("searchInput")
+        .value.trim()
+        .toLowerCase();
+      if (searchInput === "") {
+        alert("Please enter a search term.");
+        return;
+      }
+      let searchData = await searchPacks(searchInput);
+      displayData(searchData);
+    }
+
+    // Event listener for search button
+    document
+      .getElementById("searchBtn")
+      .addEventListener("click", handleSearch);
+
+    // Event listener for Enter key in search input
+    document
+      .getElementById("searchInput")
+      .addEventListener("keypress", function (e) {
+        if (e.key === "Enter") {
+          handleSearch();
+        }
+      });
+  </script>
+</body>
+</html>
