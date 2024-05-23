@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Fetch Packs</title>
+  </head>
+  <body>
+    <h1>Fetch Packs</h1>
+    <button id="fetchRandomBtn">Fetch Random Packs</button>
+    <button id="fetchAllBtn">Fetch All Packs</button>
+    <button id="fetchSpecificBtn">Fetch Specific Pack</button>
+    <div id="output"></div>
+
+    <script src="packsAPI.js"></script>
+    <script>
+      // Function to display fetched data
+      function displayData(data) {
+        let outputDiv = document.getElementById("output");
+        outputDiv.innerHTML = "";
+        if (data.length === 0) {
+          outputDiv.textContent = "No data available.";
+          return;
+        }
+        data.forEach((pack) => {
+          let packDiv = document.createElement("div");
+          packDiv.textContent = JSON.stringify(pack);
+          outputDiv.appendChild(packDiv);
+        });
+      }
+
+      // Event listeners for buttons
+      document
+        .getElementById("fetchRandomBtn")
+        .addEventListener("click", async () => {
+          let randomData = await fetchRandomDataJson(3); // Fetch 3 random packs
+          displayData(randomData);
+        });
+
+      document
+        .getElementById("fetchAllBtn")
+        .addEventListener("click", async () => {
+          let allData = await fetchAllDataJson();
+          displayData(allData);
+        });
+
+      document
+        .getElementById("fetchSpecificBtn")
+        .addEventListener("click", async () => {
+          let specificPack = await fetchDataJson("bridge-gang"); // Fetch specific pack (change pack name as needed)
+          displayData([specificPack]);
+        });
+    </script>
+  </body>
+</html>
