@@ -1,8 +1,11 @@
-[
-  {
-    "pack": "bridge-gang"
-  },
-  {
-    "pack": "onils"
-  }
-]{"key": "value"} 
+[ 
+  { 
+    "pack": "bridge-gang" 
+  }, 
+  { 
+    "pack": "onils" 
+  }, 
+  { 
+    "pack": "test" 
+  }, 
+] 
