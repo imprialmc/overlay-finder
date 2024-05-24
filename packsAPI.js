@@ -1,17 +1,24 @@
 // JavaScript code to fetch packs.json and data.json files
 
-// Function to fetch packs.json
+// Function to fetch pack names from the GitHub API
 async function fetchPacksJson() {
+  const url = 'https://api.github.com/repos/imprialmc/overlay-finder/contents/packs';
+
   try {
-    let response = await fetch(
-      "https://imprialmc.github.io/overlay-finder/packs.json"
-    );
+    const response = await fetch(url);
     if (!response.ok) {
-      throw new Error("Network response was not ok " + response.statusText);
+      throw new Error('Network response was not ok ' + response.statusText);
     }
-    return await response.json();
+    const data = await response.json();
+
+    // Process the API response to get the folder names
+    const packs = data.map(item => {
+      return { pack: item.name };
+    });
+
+    return packs;
   } catch (error) {
-    console.error("There has been a problem with your fetch operation:", error);
+    console.error('There has been a problem with your fetch operation:', error);
     return [];
   }
 }
