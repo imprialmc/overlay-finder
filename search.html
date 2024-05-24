@@ -162,13 +162,17 @@
 
           // Create image element if images exist
           if (pack.images > 0) {
+            let imageDiv = document.createElement("div");
             let imageElement = document.createElement("img");
             imageElement.src = "packs/" + pack.id + "/image1.jpg"; // Default to image1
             imageElement.alt = pack.pack_name; // Add alt text for accessibility
             imageElement.addEventListener("click", () =>
               handlePackClick(pack.id)
             ); // Add click event listener
-            packDiv.appendChild(imageElement);
+
+            imageDiv.classList.add("imageDiv");
+            imageDiv.appendChild(imageElement);
+            packDiv.appendChild(imageDiv);
           }
 
           outputDiv.appendChild(packDiv);
