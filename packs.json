@@ -1,8 +1,14 @@
-[
-  {
-    "pack": "bridge-gang"
-  },
-  {
-    "pack": "onils"
-  }
-]
+[ 
+  { 
+    "pack": "bridge-gang" 
+  }, 
+  { 
+    "pack": "bypassyou-overlay" 
+  }, 
+  { 
+    "pack": "onils" 
+  }, 
+  { 
+    "pack": "test" 
+  }, 
+] 
