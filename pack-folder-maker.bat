@@ -77,7 +77,7 @@ if "%images%"=="" (
 )
 
 rem Create directory with id as name
-mkdir "%id%"
+mkdir ".\packs\%id%"
 
 rem Create JSON string
 set json={
@@ -98,21 +98,22 @@ echo.
 echo Generated JSON:
 echo !json!
 
+:confirm
+set /p "correct=Is everything correct? (yes/no): "
+if /i "%correct%"=="no" goto input_id
+if /i "%correct%"=="yes" goto create_files
+goto confirm
+
+:create_files
 rem Copy images
 for /l %%i in (1, 1, %images%) do (
     set /p "image=image %%i (path) (leave empty to finish): "
     if not "!image!"=="" (
-        copy "!image!" "%id%\image%%i.jpg"
+        copy "!image!" ".\packs\%id%\image%%i.jpg"
     )
 )
 
 rem Write JSON to file
-echo !json!>"%id%\data.json"
+echo !json!>".\packs\%id%\data.json"
 
 echo Folder and JSON file created successfully!
-
-:confirm
-set /p "correct=Is everything correct? (yes/no): "
-if /i "%correct%"=="no" goto input_id
-if /i "%correct%"=="yes" exit /b
-goto confirm
