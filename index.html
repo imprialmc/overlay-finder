@@ -3,53 +3,142 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Fetch Packs</title>
-  </head>
-  <body>
-    <h1>Fetch Packs</h1>
-    <button id="fetchRandomBtn">Fetch Random Packs</button>
-    <button id="fetchAllBtn">Fetch All Packs</button>
-    <button id="fetchSpecificBtn">Fetch Specific Pack</button>
-    <div id="output"></div>
-
-    <script src="packsAPI.js"></script>
-    <script>
-      // Function to display fetched data
-      function displayData(data) {
-        let outputDiv = document.getElementById("output");
-        outputDiv.innerHTML = "";
-        if (data.length === 0) {
-          outputDiv.textContent = "No data available.";
-          return;
-        }
-        data.forEach((pack) => {
-          let packDiv = document.createElement("div");
-          packDiv.textContent = JSON.stringify(pack);
-          outputDiv.appendChild(packDiv);
-        });
+    <title>Bridge Overlay Search</title>
+    <!-- Navbar Styles -->
+    <link rel="stylesheet" href="assets/stylesheets/navbar.css" />
+    <link rel="stylesheet" href="assets/stylesheets/styles.css" />
+    <style>
+      /* Main styles */
+      main {
+        margin-top: 50px; /* To accommodate the fixed header */
+        padding: 40px;
       }
 
-      // Event listeners for buttons
-      document
-        .getElementById("fetchRandomBtn")
-        .addEventListener("click", async () => {
-          let randomData = await fetchRandomDataJson(3); // Fetch 3 random packs
-          displayData(randomData);
-        });
+      #output {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+      }
 
-      document
-        .getElementById("fetchAllBtn")
-        .addEventListener("click", async () => {
-          let allData = await fetchAllDataJson();
-          displayData(allData);
-        });
+      .pack {
+        width: calc(
+          33.33% - 20px
+        ); /* 33.33% width for each result box with 20px spacing */
+        border: 1px solid #ced4da; /* Added border */
+        border-radius: 5px; /* Added border-radius */
+        padding: 10px; /* Increased padding */
+        margin: 10px;
+        box-sizing: border-box;
+        text-align: center;
+        background-color: white; /* Added background color */
+        transition: all 0.3s ease; /* Added smooth transition */
+      }
 
-      document
-        .getElementById("fetchSpecificBtn")
-        .addEventListener("click", async () => {
-          let specificPack = await fetchDataJson("bridge-gang"); // Fetch specific pack (change pack name as needed)
-          displayData([specificPack]);
-        });
-    </script>
+      .pack:hover {
+        box-shadow: 0 0 30px rgba(0, 0, 0, 0.5); /* Added box-shadow on hover */
+      }
+
+      .pack img {
+        width: 100%;
+        height: auto;
+        display: block;
+        border-radius: 5px; /* Added border-radius */
+      }
+      .pack h1 {
+        margin-top: 10px; /* Added margin top */
+        margin-bottom: 5px; /* Added margin bottom */
+        font-size: 24px; /* Increased font size */
+        color: #007bff; /* Changed title color */
+      }
+      .pack h3 {
+        margin-bottom: 10px; /* Added margin bottom */
+        font-size: 12px; /* Increased font size */
+        color: #6c757d; /* Changed subtitle color */
+      }
+    </style>
+  </head>
+  <body>
+    <nav>
+      <img src="assets/images/bridge-packs.png" alt="Bridge packs logo" />
+      <ul>
+        <li><a href="index.html">Home</a></li>
+        <li><a href="/search.html">Search</a></li>
+        <li>
+          <a target="_blank" href="https://discord.gg/9pUYRNYDHH">Discord</a>
+        </li>
+      </ul>
+    </nav>
+
+    <main>
+      <div class="container">
+        <h1>Find the perfect bridge overlay!</h1>
+      </div>
+      <div id="output"></div>
+    </main>
+
+    <footer>
+      <a href="https://discord.gg/9pUYRNYDHH">Join the Bridge Packs Discord</a>
+      <p>
+        Bridge Packs does not own all of the packs on this site, please show
+        your support to the creators. If you cant find a certain pack please
+        join the discord and someone can help you there. If you have a pack you
+        want to upload please go to the discord and make a ticket.
+      </p>
+    </footer>
   </body>
+
+  <script src="packsAPI.js"></script>
+  <script>
+    // Function to handle pack click event
+    function handlePackClick(packId) {
+      window.location.href = "/pack-info.html?pack=" + packId;
+    }
+
+    // Function to display fetched data
+    function displayData(data) {
+      let outputDiv = document.getElementById("output");
+      outputDiv.innerHTML = "";
+      if (data.length === 0) {
+        outputDiv.textContent = "No data available.";
+        return;
+      }
+      data.forEach((pack) => {
+        let packDiv = document.createElement("div");
+        packDiv.classList.add("pack");
+        packDiv.addEventListener("click", () => handlePackClick(pack.id)); // Add click event listener
+
+        // Create elements for pack name, creator, and download link
+        let nameElement = document.createElement("h1");
+        nameElement.textContent = pack.pack_name;
+
+        let creatorElement = document.createElement("h3");
+        creatorElement.textContent = "By " + pack.pack_creator;
+
+        packDiv.appendChild(nameElement);
+        packDiv.appendChild(creatorElement);
+
+        // Create image element if images exist
+        if (pack.images > 0) {
+          let imageElement = document.createElement("img");
+          imageElement.src = "packs/" + pack.id + "/image1.jpg"; // Default to image1
+          imageElement.alt = pack.pack_name; // Add alt text for accessibility
+          packDiv.appendChild(imageElement);
+        }
+
+        outputDiv.appendChild(packDiv);
+      });
+    }
+
+    async function displayRandomPacks() {
+      try {
+        const randomPacks = await fetchRandomDataJson(20); // Fetch 20 random texture packs
+        displayData(randomPacks); // Display the random texture packs
+      } catch (error) {
+        console.error("Error fetching random packs:", error);
+      }
+    }
+
+    // Call the function to display random texture packs when the page loads
+    displayRandomPacks();
+  </script>
 </html>

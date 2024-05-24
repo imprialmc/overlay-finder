@@ -1,0 +1,28 @@
+nav {
+  background-color: #333;
+  text-align: center;
+  padding: 10px;
+}
+nav img {
+  height: auto;
+  height: 60px;
+}
+nav ul {
+  list-style: none;
+}
+
+nav ul li {
+  display: inline;
+  margin-right: 20px;
+}
+
+nav ul li a {
+  color: #fff;
+  text-decoration: none;
+  font-weight: 600;
+  transition: color 0.1s ease;
+}
+
+nav ul li a:hover {
+  color: #009dff; /* Change color on hover */
+}

@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Pack Info</title>
+    <link rel="stylesheet" href="assets/stylesheets/styles.css" />
+    <link rel="stylesheet" href="assets/stylesheets/navbar.css" />
+
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f5f5f5;
+        margin: 0;
+        padding: 0;
+      }
+
+      #packInfo {
+        text-align: center;
+        max-width: 600px;
+        margin: 20px auto;
+        background-color: #fff;
+        border-radius: 8px;
+        padding: 20px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      }
+
+      h1 {
+        text-align: center;
+        color: #333;
+      }
+
+      h2 {
+        margin-top: 0;
+        color: #333;
+      }
+
+      p {
+        margin: 0 0 10px;
+        color: #666;
+      }
+
+      .download-link {
+        display: block;
+        text-align: center;
+        margin-top: 20px;
+      }
+
+      .download-link a {
+        display: inline-block;
+        padding: 10px 20px;
+        background-color: #007bff;
+        color: #fff;
+        text-decoration: none;
+        border-radius: 5px;
+        transition: background-color 0.3s ease;
+      }
+
+      .download-link a:hover {
+        background-color: #0056b3;
+      }
+
+      .packImages {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        align-items: center;
+        gap: 10px;
+        margin-top: 20px;
+      }
+
+      .packImage {
+        max-width: 540px; /* Adjust as needed */
+        height: auto;
+        border-radius: 8px;
+        box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s ease;
+      }
+
+      .packImage:hover {
+        transform: scale(1.05);
+      }
+
+      #packInfo iframe {
+        margin: 10px;
+        max-width: 540px; /* Adjust as needed */
+        border-radius: 8px;
+        box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+      }
+    </style>
+  </head>
+  <body>
+    <nav>
+      <img src="assets/images/bridge-packs.png" alt="Bridge packs logo" />
+      <ul>
+        <li><a href="index.html">Home</a></li>
+        <li><a href="/search.html">Search</a></li>
+        <li>
+          <a target="_blank" href="https://discord.gg/9pUYRNYDHH">Discord</a>
+        </li>
+      </ul>
+    </nav>
+
+    <div id="packInfo"></div>
+
+    <footer>
+      <a href="https://discord.gg/9pUYRNYDHH">Join the Bridge Packs Discord</a>
+      <p>
+        Bridge Packs does not own all of the packs on this site, please show
+        your support to the creators. If you cant find a certain pack please
+        join the discord and someone can help you there. If you have a pack you
+        want to upload please go to the discord and make a ticket.
+      </p>
+    </footer>
+
+    <script src="packsAPI.js"></script>
+    <script>
+      // Function to fetch pack information based on pack name from URL
+      async function fetchPackInfoFromURL() {
+        try {
+          const urlParams = new URLSearchParams(window.location.search);
+          const packName = urlParams.get("pack");
+          if (!packName) {
+            throw new Error("Pack name not provided in URL.");
+          }
+
+          const packInfo = await fetchDataJson(packName);
+          if (!packInfo) {
+            throw new Error(
+              `Pack "${packName}" not found or data not available.`
+            );
+          }
+
+          displayPackInfo(packInfo);
+        } catch (error) {
+          console.error("Error fetching pack information:", error);
+          const packInfoDiv = document.getElementById("packInfo");
+          packInfoDiv.innerHTML = `
+                <div style="text-align: center;">
+                    <p>Error fetching pack information. Please try again later.</p>
+                    <a href="index.html">Go Back</a>
+                </div>
+            `;
+        }
+      }
+
+      // Function to display pack information on the page
+      function displayPackInfo(packInfo) {
+        const packInfoDiv = document.getElementById("packInfo");
+        packInfoDiv.innerHTML = `
+            <h2>${packInfo.pack_name}</h2>
+            <p>Description: ${packInfo.description}</p>
+            <p>Tags: ${packInfo.tags.join(", ")}</p>
+            <div class="download-link">
+                <a href="${packInfo.download_link}" target="_blank">Download</a>
+            </div>
+        `;
+
+        if (packInfo.images) {
+          const imagesDiv = document.createElement("div");
+          imagesDiv.className = "packImages";
+          for (let i = 1; i <= packInfo.images; i++) {
+            const imageUrl = `packs/${packInfo.id}/image${i}.jpg`;
+            const imageElement = document.createElement("img");
+            imageElement.src = imageUrl;
+            imageElement.alt = `Image ${i}`;
+            imageElement.className = "packImage";
+            imagesDiv.appendChild(imageElement);
+          }
+          packInfoDiv.appendChild(imagesDiv);
+        }
+
+        if (packInfo.youtube_id) {
+          const youtubeDiv = document.createElement("div");
+          youtubeDiv.innerHTML = `
+            <iframe width="560" height="315" src="https://www.youtube.com/embed/${packInfo.youtube_id}" frameborder="0" allowfullscreen></iframe>
+          `;
+          packInfoDiv.appendChild(youtubeDiv);
+        }
+      }
+      fetchPackInfoFromURL();
+    </script>
+  </body>
+</html>
